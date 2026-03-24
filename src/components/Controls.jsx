@@ -8,7 +8,6 @@ export const Controls = ({ recorder }) => {
     octave, setOctave, 
     instrument, setInstrument,
     sustain, setSustain,
-    scale, setScale,
     cutoff, setCutoff,
     reverbWet, setReverbWet
   } = useStore();
