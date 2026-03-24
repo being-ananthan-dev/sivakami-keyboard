@@ -60,7 +60,7 @@ class AudioEngine {
     this.masterVolume.volume.rampTo(db, 0.1);
   }
 
-  setFilterFreq(freq) {
+  setCutoff(freq) {
     this.filter.frequency.rampTo(freq, 0.1);
   }
 
