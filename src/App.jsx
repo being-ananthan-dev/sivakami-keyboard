@@ -32,35 +32,42 @@ function App() {
   }, [setSustain]);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col pt-8 pb-4 px-4 overflow-hidden touch-none select-none">
-      <header className="text-center mb-6 shrink-0">
-        <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">VirtuKeys</h1>
-        <p className="text-slate-400 text-sm mt-1">Multi-touch Virtual Web Instrument</p>
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-indigo-950 to-slate-950 text-slate-100 flex flex-col pt-8 pb-4 px-4 overflow-hidden touch-none select-none relative">
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+      
+      <header className="text-center mb-6 shrink-0 z-10">
+        <h1 className="text-5xl md:text-6xl font-black tracking-tighter bg-gradient-to-br from-fuchsia-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-2xl">
+          Sivakami's Keys
+        </h1>
+        <p className="text-indigo-200/70 text-sm md:text-base mt-2 font-semibold tracking-[0.2em] uppercase">
+          Exclusive Virtual Instrument
+        </p>
       </header>
 
       {!isAudioReady ? (
-        <div className="flex-1 flex flex-col items-center justify-center animate-fade-in">
-          <div className="max-w-md text-center p-8 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700">
-            <h2 className="text-2xl font-bold mb-4">Welcome to VirtuKeys</h2>
-            <p className="text-slate-400 mb-8">Click below to initialize the high-performance Tone.js audio engine.</p>
+        <div className="flex-1 flex flex-col items-center justify-center animate-fade-in z-10">
+          <div className="max-w-md text-center p-10 bg-slate-900/60 backdrop-blur-xl rounded-3xl shadow-[0_0_40px_rgba(79,70,229,0.15)] border border-indigo-500/20">
+            <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">Welcome, Sivakami A G</h2>
+            <p className="text-indigo-300/80 mb-8 leading-relaxed">Your personalized grand piano and synthesizer engines are ready to be initialized.</p>
             <button 
               onClick={initAudio}
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all hover:scale-105 active:scale-95"
+              className="px-10 py-5 bg-gradient-to-r from-indigo-500 hover:from-indigo-400 to-purple-600 hover:to-purple-500 text-white font-bold rounded-full shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-all hover:scale-105 active:scale-95 border border-indigo-400/30"
             >
-              Start Playing
+              Start Playing Engine
             </button>
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col animate-fade-in min-h-0">
+        <div className="flex-1 flex flex-col animate-fade-in min-h-0 z-10 max-w-6xl w-full mx-auto">
           <Controls recorder={recorder} />
           
-          <div className="flex-1 flex flex-col items-center justify-end mt-4 min-h-0 overflow-hidden">
+          <div className="flex-1 flex flex-col items-center justify-end mt-4 mb-2 min-h-0 overflow-hidden perspective-1000">
             <Keyboard recordEvent={recorder.recordEvent} />
           </div>
           
-          <div className="shrink-0 mt-4 text-center text-xs text-slate-500 hidden md:block">
-            <p>Use QWERTY rows to play. Spacebar for sustain pedal. Touch screens fully supported.</p>
+          <div className="shrink-0 mt-2 text-center text-xs text-indigo-300/50 flex flex-col items-center gap-1">
+            <p>Made exclusively for <strong>Sivakami A G</strong> • Spacebar for sustain pedal</p>
+            <p className="hidden md:block">Use your keyboard (Z-M, Q-P rows) or touch screen to play chords.</p>
           </div>
         </div>
       )}

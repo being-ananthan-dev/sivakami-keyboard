@@ -19,16 +19,16 @@ export const Controls = ({ recorder }) => {
   } = recorder;
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-slate-800 rounded-lg shadow-xl w-full max-w-4xl mx-auto mt-4 border border-slate-700">
+    <div className="flex flex-col gap-4 p-5 bg-indigo-950/40 backdrop-blur-xl rounded-2xl shadow-[0_8px_32px_rgba(31,38,135,0.37)] w-full max-w-4xl mx-auto mt-4 border border-indigo-500/20">
       <div className="flex flex-wrap items-center justify-between gap-4">
         
         <div className="flex items-center gap-4">
           <div className="flex flex-col">
-            <label className="text-xs text-slate-400 mb-1 uppercase font-bold tracking-wider">Instrument</label>
+            <label className="text-xs text-indigo-300/80 mb-1 uppercase font-bold tracking-wider">Instrument</label>
             <select 
               value={instrument}
               onChange={(e) => setInstrument(e.target.value)}
-              className="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2"
+              className="bg-slate-900/80 backdrop-blur border border-indigo-500/30 text-indigo-100 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2 shadow-inner"
             >
               <option value="piano">🎹 Grand Piano</option>
               <option value="synth">🌊 Poly Synth</option>
@@ -37,17 +37,17 @@ export const Controls = ({ recorder }) => {
           </div>
 
           <div className="flex flex-col">
-            <label className="text-xs text-slate-400 mb-1 uppercase font-bold tracking-wider text-center">Octave</label>
-            <div className="flex items-center bg-slate-900 rounded-md border border-slate-700">
+            <label className="text-xs text-indigo-300/80 mb-1 uppercase font-bold tracking-wider text-center">Octave</label>
+            <div className="flex items-center bg-slate-900/80 backdrop-blur rounded-lg border border-indigo-500/30 shadow-inner">
               <button 
                 onClick={() => setOctave(octave - 1)}
-                className="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded-l-md transition-colors"
+                className="px-3 py-1.5 text-indigo-300 hover:text-white hover:bg-indigo-500/30 rounded-l-lg transition-colors"
                 disabled={octave <= 1}
               >-</button>
-              <span className="px-3 py-1.5 font-mono text-sm min-w-[2rem] text-center border-x border-slate-700">{octave}</span>
+              <span className="px-3 py-1.5 font-mono text-sm min-w-[2rem] text-center border-x border-indigo-500/30 text-indigo-100">{octave}</span>
               <button 
                 onClick={() => setOctave(octave + 1)}
-                className="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded-r-md transition-colors"
+                className="px-3 py-1.5 text-indigo-300 hover:text-white hover:bg-indigo-500/30 rounded-r-lg transition-colors"
                 disabled={octave >= 6}
               >+</button>
             </div>
@@ -104,11 +104,11 @@ export const Controls = ({ recorder }) => {
 
         <div className="flex items-center gap-6">
           <div className="flex flex-col">
-            <label className="text-xs text-slate-400 mb-1 uppercase font-bold tracking-wider">Scale</label>
+            <label className="text-xs text-indigo-300/80 mb-1 uppercase font-bold tracking-wider">Scale</label>
             <select 
               value={scale || ''}
               onChange={(e) => setScale(e.target.value || null)}
-              className="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-1.5 min-w-[100px]"
+              className="bg-slate-900/80 backdrop-blur border border-indigo-500/30 text-indigo-100 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-1.5 min-w-[100px] shadow-inner"
             >
               <option value="">None</option>
               {NOTES.map(n => <option key={n} value={n}>{n} Major</option>)}
