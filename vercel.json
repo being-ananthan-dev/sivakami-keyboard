@@ -17,7 +17,7 @@
       ]
     },
     {
-      "source": "/(.*)-(.*)\\.(js|css|woff2|png|svg|jpg)",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
