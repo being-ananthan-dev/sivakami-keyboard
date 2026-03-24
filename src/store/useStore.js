@@ -1,13 +1,17 @@
 import { create } from 'zustand';
 
 export const useStore = create((set) => ({
-  volume: 0, // dB
+  volume: 0, 
   octave: 3,
-  instrument: 'synth', // 'piano', 'synth', 'organ'
+  instrument: 'synth', 
   sustain: false,
-  scale: null, // e.g., 'C' for C Major
-  transpose: 0, // semitones (-12 to +12)
+  scale: null, 
+  transpose: 0, 
   isAudioReady: false,
+  
+  // Cinematic FX state
+  cutoff: 2000,
+  reverbWet: 0.3,
 
   setVolume: (vol) => set({ volume: vol }),
   setOctave: (oct) => set({ octave: Math.max(1, Math.min(6, oct)) }),
@@ -16,4 +20,7 @@ export const useStore = create((set) => ({
   setScale: (scale) => set({ scale }),
   setTranspose: (trans) => set({ transpose: Math.max(-12, Math.min(12, trans)) }),
   setAudioReady: (ready) => set({ isAudioReady: ready }),
+  
+  setCutoff: (cutoff) => set({ cutoff }),
+  setReverbWet: (reverbWet) => set({ reverbWet }),
 }));

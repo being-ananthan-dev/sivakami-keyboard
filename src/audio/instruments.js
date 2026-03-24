@@ -12,9 +12,33 @@ const PIANO_URLS = {
 export const createPiano = (onLoad) => {
   return new Tone.Sampler({
     urls: PIANO_URLS,
-    release: 1,
+    release: 1.5,
     baseUrl: "https://tonejs.github.io/audio/salamander/",
     onload: onLoad,
+  });
+};
+
+export const createCinematicPad = () => {
+  return new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "sine" },
+    envelope: {
+      attack: 2,
+      decay: 1,
+      sustain: 0.8,
+      release: 3
+    }
+  });
+};
+
+export const createStrings = () => {
+  return new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "sawtooth" },
+    envelope: {
+      attack: 0.5,
+      decay: 0.2,
+      sustain: 0.7,
+      release: 1.5
+    }
   });
 };
 
@@ -31,18 +55,6 @@ export const createSynth = () => {
       decay: 1.2,
       sustain: 0,
       release: 1.2
-    }
-  });
-};
-
-export const createOrgan = () => {
-  return new Tone.PolySynth(Tone.Synth, {
-    oscillator: { type: "square" },
-    envelope: {
-      attack: 0.01,
-      decay: 0.1,
-      sustain: 1,
-      release: 0.5
     }
   });
 };

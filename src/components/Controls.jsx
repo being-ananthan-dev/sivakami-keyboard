@@ -1,4 +1,4 @@
-import { Volume2, VolumeX, Settings, Music, Mic, Square, Play, Download } from 'lucide-react';
+import { Volume2, VolumeX, Mic, Square, Play, Download, Waves } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { NOTES } from '../utils/noteMap';
 
@@ -8,7 +8,9 @@ export const Controls = ({ recorder }) => {
     octave, setOctave, 
     instrument, setInstrument,
     sustain, setSustain,
-    scale, setScale
+    scale, setScale,
+    cutoff, setCutoff,
+    reverbWet, setReverbWet
   } = useStore();
 
   const {
@@ -19,113 +21,103 @@ export const Controls = ({ recorder }) => {
   } = recorder;
 
   return (
-    <div className="flex flex-col gap-4 p-5 bg-indigo-950/40 backdrop-blur-xl rounded-2xl shadow-[0_8px_32px_rgba(31,38,135,0.37)] w-full max-w-4xl mx-auto mt-4 border border-indigo-500/20">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="flex flex-col gap-6 p-6 bg-slate-950/80 backdrop-blur-2xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-5xl mx-auto mt-4 border border-white/5 relative overflow-hidden">
+      <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+        <Waves size={120} className="text-indigo-400" />
+      </div>
+
+      <div className="flex flex-wrap items-end justify-between gap-6 relative z-10">
         
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col">
-            <label className="text-xs text-indigo-300/80 mb-1 uppercase font-bold tracking-wider">Instrument</label>
+        <div className="flex items-center gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] text-indigo-300/60 uppercase font-black tracking-[0.2em]">Instrument</label>
             <select 
               value={instrument}
               onChange={(e) => setInstrument(e.target.value)}
-              className="bg-slate-900/80 backdrop-blur border border-indigo-500/30 text-indigo-100 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2 shadow-inner"
+              className="bg-slate-900 border border-white/10 text-indigo-50 text-xs rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none block p-3 min-w-[160px] shadow-2xl appearance-none cursor-pointer hover:bg-slate-800 transition-colors"
             >
               <option value="piano">🎹 Grand Piano</option>
-              <option value="synth">🌊 Poly Synth</option>
-              <option value="organ">🏛️ Classic Organ</option>
+              <option value="pad">🌌 Cinematic Pad</option>
+              <option value="strings">🎻 Orchestral Strings</option>
+              <option value="synth">⚡ Lead Synth</option>
             </select>
           </div>
 
-          <div className="flex flex-col">
-            <label className="text-xs text-indigo-300/80 mb-1 uppercase font-bold tracking-wider text-center">Octave</label>
-            <div className="flex items-center bg-slate-900/80 backdrop-blur rounded-lg border border-indigo-500/30 shadow-inner">
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] text-indigo-300/60 uppercase font-black tracking-[0.2em] text-center">Register</label>
+            <div className="flex items-center bg-slate-900 rounded-xl border border-white/10 p-1 shadow-2xl">
               <button 
                 onClick={() => setOctave(octave - 1)}
-                className="px-3 py-1.5 text-indigo-300 hover:text-white hover:bg-indigo-500/30 rounded-l-lg transition-colors"
+                className="w-10 h-10 flex items-center justify-center text-indigo-300 hover:text-white hover:bg-white/5 rounded-lg transition-all disabled:opacity-20"
                 disabled={octave <= 1}
               >-</button>
-              <span className="px-3 py-1.5 font-mono text-sm min-w-[2rem] text-center border-x border-indigo-500/30 text-indigo-100">{octave}</span>
+              <span className="w-10 text-center font-black text-sm text-indigo-100">{octave}</span>
               <button 
                 onClick={() => setOctave(octave + 1)}
-                className="px-3 py-1.5 text-indigo-300 hover:text-white hover:bg-indigo-500/30 rounded-r-lg transition-colors"
+                className="w-10 h-10 flex items-center justify-center text-indigo-300 hover:text-white hover:bg-white/5 rounded-lg transition-all disabled:opacity-20"
                 disabled={octave >= 6}
               >+</button>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col">
-          <label className="text-xs text-slate-400 mb-1 uppercase font-bold tracking-wider">Recorder</label>
-          <div className="flex gap-2">
-            {!isRecording ? (
-              <button onClick={startRecording} disabled={isPlaying} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-700 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-colors disabled:opacity-50">
-                <Mic size={18} />
-              </button>
-            ) : (
-              <button onClick={stopRecording} className="w-10 h-10 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white animate-pulse transition-colors">
-                <Square size={18} fill="currentColor" />
-              </button>
-            )}
-            
-            {!isPlaying ? (
-              <button onClick={playRecording} disabled={!hasRecording || isRecording} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-700 hover:bg-green-500/20 text-green-400 hover:text-green-300 transition-colors disabled:opacity-50">
-                <Play size={18} fill="currentColor" />
-              </button>
-            ) : (
-              <button onClick={stopPlayback} className="w-10 h-10 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 text-white transition-colors">
-                <Square size={18} fill="currentColor" />
-              </button>
-            )}
-
-            <button onClick={exportRecording} disabled={!hasRecording || isRecording || isPlaying} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-700 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 transition-colors disabled:opacity-50" title="Export JSON">
-              <Download size={18} />
-            </button>
+        <div className="flex gap-6 h-full items-end">
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] text-indigo-300/60 uppercase font-black tracking-[0.2em]">Cinematic FX</label>
+            <div className="flex gap-4 bg-slate-900/50 p-3 rounded-2xl border border-white/5 shadow-inner">
+              <div className="flex flex-col gap-1 items-center">
+                <input 
+                  type="range" min="200" max="10000" value={cutoff} 
+                  onChange={(e) => setCutoff(parseInt(e.target.value))}
+                  className="w-24 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-400"
+                />
+                <span className="text-[9px] text-indigo-400/60 uppercase font-bold">Filter</span>
+              </div>
+              <div className="flex flex-col gap-1 items-center">
+                <input 
+                  type="range" min="0" max="1" step="0.01" value={reverbWet} 
+                  onChange={(e) => setReverbWet(parseFloat(e.target.value))}
+                  className="w-24 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-400"
+                />
+                <span className="text-[9px] text-purple-400/60 uppercase font-bold">Ambient</span>
+              </div>
+            </div>
           </div>
         </div>
 
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] text-indigo-300/60 uppercase font-black tracking-[0.2em]">Session</label>
+          <div className="flex gap-3 bg-slate-900/50 p-2 rounded-2xl border border-white/5 shadow-2xl">
+            <button onClick={isRecording ? stopRecording : startRecording} className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all ${isRecording ? 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)] animate-pulse' : 'bg-slate-800 hover:bg-red-500/20 text-red-400 border border-white/5'}`}>
+              {isRecording ? <Square size={20} fill="white" /> : <Mic size={20} />}
+            </button>
+            <button onClick={isPlaying ? stopPlayback : playRecording} disabled={!hasRecording || isRecording} className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all disabled:opacity-20 ${isPlaying ? 'bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.5)]' : 'bg-slate-800 hover:bg-indigo-500/20 text-indigo-400 border border-white/5'}`}>
+              {isPlaying ? <Square size={20} fill="white" /> : <Play size={20} fill="currentColor" />}
+            </button>
+            <button onClick={exportRecording} disabled={!hasRecording || isRecording || isPlaying} className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-indigo-400/20 text-indigo-300 border border-white/5 transition-all disabled:opacity-20">
+              <Download size={20} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="h-px w-full bg-slate-700 my-1"></div>
-
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <label className="flex items-center gap-3 cursor-pointer group">
+      <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
+        <label className="flex items-center gap-4 cursor-pointer group">
           <div className="relative">
-            <input 
-              type="checkbox" 
-              className="sr-only"
-              checked={sustain}
-              onChange={(e) => setSustain(e.target.checked)}
-            />
-            <div className={`block w-10 h-6 rounded-full transition-colors ${sustain ? 'bg-blue-500' : 'bg-slate-700'}`}></div>
-            <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${sustain ? 'translate-x-4' : ''}`}></div>
+            <input type="checkbox" className="sr-only" checked={sustain} onChange={(e) => setSustain(e.target.checked)} />
+            <div className={`block w-12 h-6 rounded-full transition-all duration-300 ${sustain ? 'bg-indigo-500' : 'bg-slate-800 shadow-inner'}`}></div>
+            <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 shadow-lg ${sustain ? 'translate-x-6' : ''}`}></div>
           </div>
-          <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Sustain Pedal (Spacebar)</span>
+          <span className={`text-xs font-black uppercase tracking-[0.1em] transition-colors ${sustain ? 'text-indigo-300' : 'text-slate-500'}`}>Sustain Drive</span>
         </label>
 
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col">
-            <label className="text-xs text-indigo-300/80 mb-1 uppercase font-bold tracking-wider">Scale</label>
-            <select 
-              value={scale || ''}
-              onChange={(e) => setScale(e.target.value || null)}
-              className="bg-slate-900/80 backdrop-blur border border-indigo-500/30 text-indigo-100 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-1.5 min-w-[100px] shadow-inner"
-            >
-              <option value="">None</option>
-              {NOTES.map(n => <option key={n} value={n}>{n} Major</option>)}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {volume <= -30 ? <VolumeX size={18} className="text-slate-400" /> : <Volume2 size={18} className="text-slate-400" />}
-            <input 
-              type="range" 
-              min="-30" 
-              max="10" 
-              value={volume} 
-              onChange={(e) => setVolume(parseFloat(e.target.value))}
-              className="w-24 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-            />
-          </div>
+        <div className="flex items-center gap-4 bg-slate-900/30 px-4 py-2 rounded-full border border-white/5">
+          {volume <= -30 ? <VolumeX size={16} className="text-slate-500" /> : <Volume2 size={16} className="text-indigo-400" />}
+          <input 
+            type="range" min="-40" max="0" step="1" value={volume} 
+            onChange={(e) => setVolume(parseFloat(e.target.value))}
+            className="w-32 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+          />
         </div>
       </div>
     </div>

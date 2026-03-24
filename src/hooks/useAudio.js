@@ -3,7 +3,7 @@ import { engine } from '../audio/audioEngine';
 import { useStore } from '../store/useStore';
 
 export const useAudio = () => {
-  const { volume, instrument, sustain, setAudioReady } = useStore();
+  const { volume, instrument, sustain, setAudioReady, cutoff, reverbWet } = useStore();
 
   useEffect(() => {
     engine.setVolume(volume);
@@ -12,6 +12,14 @@ export const useAudio = () => {
   useEffect(() => {
     engine.setInstrument(instrument);
   }, [instrument]);
+
+  useEffect(() => {
+    engine.setCutoff(cutoff);
+  }, [cutoff]);
+
+  useEffect(() => {
+    engine.setReverbWet(reverbWet);
+  }, [reverbWet]);
 
   useEffect(() => {
     if (!sustain) {
@@ -23,8 +31,8 @@ export const useAudio = () => {
     await engine.init(() => setAudioReady(true));
   }, [setAudioReady]);
 
-  const playNote = useCallback((note) => {
-    engine.playNote(note);
+  const playNote = useCallback((note, velocity) => {
+    engine.playNote(note, velocity);
   }, []);
 
   const stopNote = useCallback((note) => {
@@ -32,5 +40,5 @@ export const useAudio = () => {
     engine.stopNote(note, sustainEnabled);
   }, []);
 
-  return { initAudio, playNote, stopNote };
+  return { initAudio, playNote, stopNote, analyzer: engine.analyzer };
 };
