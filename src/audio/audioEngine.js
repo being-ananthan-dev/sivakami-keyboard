@@ -29,7 +29,7 @@ class AudioEngine {
     // Modulation LFO
     this.lfo = new Tone.LFO("4n", 400, 4000).start();
     this.lfo.connect(this.filter.frequency);
-    this.lfo.state = 'stopped'; // Manual state tracking
+    this.lfoStarted = false; // Manual state tracking
 
     // Arpeggiator
     this.arpActive = false;
@@ -142,13 +142,13 @@ class AudioEngine {
     if (active) {
       this.lfo.frequency.value = rate;
       this.lfo.amplitude.value = depth / 2000; // Normalize
-      if (this.lfo.state === 'stopped') {
+      if (!this.lfoStarted) {
         this.lfo.start();
-        this.lfo.state = 'started';
+        this.lfoStarted = true;
       }
     } else {
       this.lfo.stop();
-      this.lfo.state = 'stopped';
+      this.lfoStarted = false;
       this.filter.frequency.value = 2000; // Reset
     }
   }
