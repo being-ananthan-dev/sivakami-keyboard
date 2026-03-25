@@ -26,6 +26,17 @@ class AudioEngine {
     this.activeNotes = new Set();
     this.sustainedNotes = new Set();
     
+    // Modulation LFO
+    this.lfo = new Tone.LFO("4n", 400, 4000).start();
+    this.lfo.connect(this.filter.frequency);
+    this.lfo.state = 'stopped'; // Manual state tracking
+
+    // Arpeggiator
+    this.arpActive = false;
+    this.arpNotes = [];
+    this.arpPattern = null;
+    this.arpRate = "8n";
+
     // For visualization
     this.analyzer = new Tone.Analyser("waveform", 256);
     this.masterVolume.connect(this.analyzer);
@@ -68,11 +79,58 @@ class AudioEngine {
     this.reverb.wet.rampTo(wet, 0.1);
   }
 
+  setArp(active, rate = "8n") {
+    this.arpActive = active;
+    this.arpRate = rate;
+    this.updateArp();
+  }
+
+  setLFO(active, rate = "4n", depth = 1000) {
+    if (active) {
+      this.lfo.frequency.value = rate;
+      this.lfo.amplitude.value = depth / 2000; // Normalize
+      if (this.lfo.state === 'stopped') {
+        this.lfo.start();
+        this.lfo.state = 'started';
+      }
+    } else {
+      this.lfo.stop();
+      this.lfo.state = 'stopped';
+      this.filter.frequency.value = 2000; // Reset
+    }
+  }
+
+  updateArp() {
+    if (this.arpPattern) {
+      this.arpPattern.dispose();
+      this.arpPattern = null;
+    }
+
+    if (this.arpActive && this.arpNotes.length > 0) {
+      this.arpPattern = new Tone.Pattern((time, note) => {
+        if (this.currentInstrument) {
+          this.currentInstrument.triggerAttackRelease(note, "16n", time);
+        }
+      }, this.arpNotes, "up");
+      this.arpPattern.interval = this.arpRate;
+      this.arpPattern.start(0);
+    }
+  }
+
   playNote(note, velocity = 0.8) {
     if (!this.initialized || !this.currentInstrument) return;
     
-    const finalVelocity = this.currentInstrument instanceof Tone.Sampler ? velocity : velocity * 0.5;
-    this.currentInstrument.triggerAttack(note, Tone.now(), finalVelocity);
+    if (this.arpActive) {
+      if (!this.arpNotes.includes(note)) {
+        this.arpNotes.push(note);
+        this.arpNotes.sort(); // Sort for predictable patterns
+        this.updateArp();
+      }
+    } else {
+      const finalVelocity = this.currentInstrument instanceof Tone.Sampler ? velocity : velocity * 0.5;
+      this.currentInstrument.triggerAttack(note, Tone.now(), finalVelocity);
+    }
+    
     this.activeNotes.add(note);
     this.sustainedNotes.add(note);
   }
@@ -81,8 +139,15 @@ class AudioEngine {
     if (!this.initialized || !this.currentInstrument) return;
     this.activeNotes.delete(note);
     
+    if (this.arpActive) {
+      this.arpNotes = this.arpNotes.filter(n => n !== note);
+      this.updateArp();
+    }
+
     if (!sustainEnabled) {
-      this.currentInstrument.triggerRelease(note, Tone.now());
+      if (!this.arpActive) {
+        this.currentInstrument.triggerRelease(note, Tone.now());
+      }
       this.sustainedNotes.delete(note);
     }
   }

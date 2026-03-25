@@ -7,6 +7,25 @@ export const getKeysForOctave = (octave) => {
   }));
 };
 
+export const getFullPianoKeys = () => {
+  const allKeys = [];
+  
+  // A0 to B0
+  allKeys.push({ note: 'A0', isBlack: false });
+  allKeys.push({ note: 'A#0', isBlack: true });
+  allKeys.push({ note: 'B0', isBlack: false });
+  
+  // C1 to B7
+  for (let oct = 1; oct <= 7; oct++) {
+    allKeys.push(...getKeysForOctave(oct));
+  }
+  
+  // C8
+  allKeys.push({ note: 'C8', isBlack: false });
+  
+  return allKeys;
+};
+
 // Maps PC keyboard chars to steps relative to current octave
 export const KEYBOARD_MAP = {
   // White keys

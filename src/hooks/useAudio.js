@@ -3,7 +3,10 @@ import { engine } from '../audio/audioEngine';
 import { useStore } from '../store/useStore';
 
 export const useAudio = () => {
-  const { volume, instrument, sustain, setAudioReady, cutoff, reverbWet } = useStore();
+  const { 
+    volume, instrument, sustain, setAudioReady, cutoff, reverbWet,
+    arpActive, arpRate, lfoActive, lfoRate, lfoDepth
+  } = useStore();
 
   useEffect(() => {
     engine.setVolume(volume);
@@ -20,6 +23,14 @@ export const useAudio = () => {
   useEffect(() => {
     engine.setReverbWet(reverbWet);
   }, [reverbWet]);
+
+  useEffect(() => {
+    engine.setArp(arpActive, arpRate);
+  }, [arpActive, arpRate]);
+
+  useEffect(() => {
+    engine.setLFO(lfoActive, lfoRate, lfoDepth);
+  }, [lfoActive, lfoRate, lfoDepth]);
 
   useEffect(() => {
     if (!sustain) {
