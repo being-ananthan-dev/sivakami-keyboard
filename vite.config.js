@@ -13,9 +13,9 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
       },
       manifest: {
-        name: "VirtuKeys Professional",
-        short_name: 'VirtuKeys',
-        description: 'Elite Cinematic Scoring Workstation',
+        name: "Sivakami's Cinematic Suite",
+        short_name: "Sivakami's Keys",
+        description: 'Elite Cinematic Scoring Workstation for Sivakami A G',
         theme_color: '#020617',
         background_color: '#020617',
         display: 'standalone',

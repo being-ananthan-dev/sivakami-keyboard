@@ -65,7 +65,7 @@ export const Keyboard = () => {
         <div className="h-px flex-1 mx-8 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
         <span>High Melodic</span>
       </div>
-      <div ref={containerRef} className="flex w-full overflow-x-auto py-8 select-none touch-none px-4 scrollbar-hide">
+      <div ref={containerRef} className="flex w-full overflow-x-auto py-8 select-none touch-pan-y px-4 scrollbar-hide">
         <div className="flex relative items-start">
           {keys.map(({ note, isBlack }) => (
             <Key key={note} note={note} isBlack={isBlack} isPhysicalPressed={pressed.has(note)} playNote={playNote} stopNote={stopNote} />

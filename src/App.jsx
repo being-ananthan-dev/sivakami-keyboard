@@ -43,14 +43,14 @@ function App() {
       <div className="max-w-7xl mx-auto flex flex-col relative z-10">
         <header className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.4)]">
-              <span className="text-2xl font-black text-white italic">V</span>
+            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.3)] border border-white/10">
+              <span className="text-2xl font-black text-white italic">S</span>
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-black uppercase text-white leading-none">
-                VirtuKeys <span className="text-indigo-400">Professional</span>
+              <h1 className="text-2xl md:text-3xl font-black uppercase text-white leading-none tracking-tight">
+                Sivakami's <span className="text-indigo-400">Cinematic Suite</span>
               </h1>
-              <p className="text-[10px] uppercase tracking-[0.4em] text-slate-500 font-bold mt-1">Cinematic Scoring Workstation</p>
+              <p className="text-[10px] uppercase tracking-[0.4em] text-slate-500 font-black mt-1">Professional Scoring Workstation</p>
             </div>
           </div>
 
@@ -67,7 +67,12 @@ function App() {
             <div className="lg:col-span-2"><Controls /></div>
             <Visualizer analyzer={analyzer} />
           </div>
-          <main className="w-full pb-12"><Keyboard /></main>
+          <main className="w-full pb-8"><Keyboard /></main>
+          
+          <footer className="w-full flex justify-between items-center py-6 border-t border-white/5 opacity-40 hover:opacity-100 transition-opacity">
+            <p className="text-[9px] uppercase tracking-[0.3em] font-black">Design & Engineering by Antigravity</p>
+            <p className="text-[9px] uppercase tracking-[0.3em] font-black italic">Exclusively for Sivakami A G</p>
+          </footer>
         </div>
       </div>
     </div>

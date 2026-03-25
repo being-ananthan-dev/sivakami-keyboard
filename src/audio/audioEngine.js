@@ -13,6 +13,7 @@ class AudioEngine {
     this.delay = null;
     this.filter = null;
     this.analyzer = null;
+    this.limiter = null;
     this.activeNotes = new Set();
     this.sustainedNotes = new Set();
     
@@ -29,11 +30,12 @@ class AudioEngine {
     if (this.initialized) return;
     await Tone.start();
 
-    this.masterVol = new Tone.Volume(0).toDestination();
+    this.limiter = new Tone.Limiter(-1).toDestination();
+    this.masterVol = new Tone.Volume(-12).connect(this.limiter);
     this.analyzer = new Tone.Analyser('waveform', 256);
     this.recorder = new Tone.Recorder();
-    this.masterVol.connect(this.analyzer);
-    this.masterVol.connect(this.recorder);
+    this.limiter.connect(this.analyzer);
+    this.limiter.connect(this.recorder);
 
     this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 }).connect(this.masterVol);
     await this.reverb.ready;
