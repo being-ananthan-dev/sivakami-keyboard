@@ -8,13 +8,25 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: "Sivakami's Keys",
-        short_name: 'SivakamiKeys',
-        description: 'Exclusive Virtual Instrument for Sivakami A G',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        name: "VirtuKeys Professional",
+        short_name: 'VirtuKeys',
+        description: 'Elite Cinematic Scoring Workstation',
+        theme_color: '#020617',
+        background_color: '#020617',
         display: 'standalone',
-        orientation: 'landscape'
+        orientation: 'landscape',
+        icons: [
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
       }
     })
   ]
