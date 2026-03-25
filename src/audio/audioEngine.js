@@ -12,8 +12,10 @@ class AudioEngine {
     this.reverb = null;
     this.delay = null;
     this.filter = null;
+    this.masterEQ = null;
     this.analyzer = null;
     this.limiter = null;
+    this.compressor = null;
     this.activeNotes = new Set();
     this.sustainedNotes = new Set();
     
@@ -31,7 +33,10 @@ class AudioEngine {
     await Tone.start();
 
     this.limiter = new Tone.Limiter(-1).toDestination();
-    this.masterVol = new Tone.Volume(-12).connect(this.limiter);
+    this.compressor = new Tone.Compressor({ threshold: -24, ratio: 4 }).connect(this.limiter);
+    this.masterEQ = new Tone.EQ3({ high: -3, mid: 0, low: 0 }).connect(this.compressor);
+    this.masterVol = new Tone.Volume(-18).connect(this.masterEQ);
+    
     this.analyzer = new Tone.Analyser('waveform', 256);
     this.recorder = new Tone.Recorder();
     this.limiter.connect(this.analyzer);
@@ -44,16 +49,19 @@ class AudioEngine {
     this.filter = new Tone.Filter({ frequency: 5000, type: 'lowpass' }).connect(this.delay);
 
     this.synth = new Tone.PolySynth(Tone.Synth, {
+      maxPolyphony: 12,
       oscillator: { type: 'fatsawtooth', spread: 30, count: 3 },
       envelope: { attack: 0.01, decay: 0.5, sustain: 0.4, release: 1 }
     }).connect(this.filter);
 
     this.pad = new Tone.PolySynth(Tone.Synth, {
+      maxPolyphony: 8,
       oscillator: { type: 'sine' },
       envelope: { attack: 1.5, decay: 1, sustain: 0.8, release: 3 }
     }).connect(this.filter);
 
     this.strings = new Tone.PolySynth(Tone.Synth, {
+      maxPolyphony: 8,
       oscillator: { type: 'sawtooth' },
       envelope: { attack: 0.4, decay: 0.3, sustain: 0.7, release: 1.5 }
     }).connect(this.filter);

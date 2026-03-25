@@ -36,11 +36,11 @@ function App() {
   }, [isAudioReady, initAudio]);
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden bg-[#020617] text-slate-100 p-4 md:p-6 flex flex-col relative font-sans">
+    <div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-[#020617] text-slate-100 p-2 md:p-6 flex flex-col relative font-sans">
       <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col relative z-10 overflow-hidden">
+      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col relative z-10 overflow-hidden h-full">
         <header className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 flex-shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.3)] border border-white/10">

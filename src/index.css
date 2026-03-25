@@ -42,3 +42,16 @@ body {
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
+
+/* Mobile Ratio Fixes */
+@media (max-height: 740px) and (max-width: 640px) {
+  #root > div {
+    zoom: 0.82;
+  }
+}
+
+@media (max-height: 600px) {
+  #root > div {
+    zoom: 0.75;
+  }
+}
