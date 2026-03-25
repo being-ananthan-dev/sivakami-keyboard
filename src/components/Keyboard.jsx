@@ -58,8 +58,15 @@ export const Keyboard = ({ recordEvent }) => {
   }, [octave]);
 
   return (
-    <div className="flex justify-center w-full overflow-x-auto py-8 select-none touch-none px-4">
-      <div className="flex relative items-start">
+    <div className="flex flex-col w-full gap-2">
+      <div className="flex justify-between items-center px-4 text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+        <span>Low Frequency</span>
+        <div className="h-[1px] flex-1 mx-4 bg-gradient-to-r from-transparent via-slate-800 to-transparent"></div>
+        <span>High Frequency</span>
+      </div>
+      
+      <div className="flex w-full overflow-x-auto py-8 select-none touch-none px-4 scrollbar-hide active:cursor-grabbing">
+        <div className="flex relative items-start mx-auto">
         {keys.map(({ note, isBlack }) => {
           const isHighlighted = highlightedNotes.includes(note.replace(/\d/, ''));
           const isPressed = pressedKeys.has(note);
@@ -75,6 +82,7 @@ export const Keyboard = ({ recordEvent }) => {
             />
           );
         })}
+        </div>
       </div>
     </div>
   );

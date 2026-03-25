@@ -4,11 +4,11 @@ import { useAudio } from '../hooks/useAudio';
 
 export const Key = ({ note, isBlack, isHighlighted, recordEvent, isPhysicalPressed }) => {
   const { playNote, stopNote } = useAudio();
-  const [isPointerActive, setIsPointerActive] = useState(false);
+  const [activePointers, setActivePointers] = useState(new Set());
   const { isAudioReady } = useStore();
   const keyRef = useRef(null);
 
-  const isActive = isPointerActive || isPhysicalPressed;
+  const isActive = activePointers.size > 0 || isPhysicalPressed;
 
   const getVelocity = (e) => {
     if (!keyRef.current) return 0.8;
@@ -20,49 +20,62 @@ export const Key = ({ note, isBlack, isHighlighted, recordEvent, isPhysicalPress
   };
 
   const handlePointerDown = (e) => {
-    e.preventDefault();
-    e.target.setPointerCapture(e.pointerId);
     if (!isAudioReady) return;
     
-    setIsPointerActive(true);
+    setActivePointers(prev => {
+      const next = new Set(prev);
+      next.add(e.pointerId);
+      return next;
+    });
+
     const velocity = getVelocity(e);
     playNote(note, velocity);
     if (recordEvent) recordEvent('on', note, velocity);
   };
 
   const handlePointerUp = (e) => {
-    e.preventDefault();
-    e.target.releasePointerCapture(e.pointerId);
     if (!isAudioReady) return;
-    setIsPointerActive(false);
+    
+    setActivePointers(prev => {
+      const next = new Set(prev);
+      next.delete(e.pointerId);
+      return next;
+    });
+
     stopNote(note);
     if (recordEvent) recordEvent('off', note);
   };
 
   const handlePointerEnter = (e) => {
-    e.preventDefault();
     if (!isAudioReady) return;
     if (e.buttons > 0) {
-      setIsPointerActive(true);
-      const velocity = 0.8; // Default for glide
+      setActivePointers(prev => {
+        const next = new Set(prev);
+        next.add(e.pointerId);
+        return next;
+      });
+      const velocity = 0.8;
       playNote(note, velocity);
       if (recordEvent) recordEvent('on', note, velocity);
     }
   };
 
   const handlePointerLeave = (e) => {
-    e.preventDefault();
     if (!isAudioReady) return;
-    if (isPointerActive) {
-      setIsPointerActive(false);
-      stopNote(note);
-      if (recordEvent) recordEvent('off', note);
-    }
+    setActivePointers(prev => {
+      const next = new Set(prev);
+      if (next.has(e.pointerId)) {
+        next.delete(e.pointerId);
+        stopNote(note);
+        if (recordEvent) recordEvent('off', note);
+      }
+      return next;
+    });
   };
 
-  const baseClass = "relative rounded-b-lg transition-all duration-75 select-none shrink-0 touch-none group overflow-hidden";
-  const whiteClass = `w-12 h-56 bg-slate-100 z-0 ${isActive ? 'bg-indigo-300 shadow-[inset_0_4px_12px_rgba(0,0,0,0.2)] translate-y-1' : 'shadow-[0_8px_0_#cbd5e1,0_15px_20px_rgba(0,0,0,0.3)]'}`;
-  const blackClass = `w-8 h-36 bg-slate-900 z-10 -mx-4 rounded-b-md ${isActive ? 'bg-indigo-900 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] translate-y-1' : 'shadow-[0_6px_0_#000,0_10px_15px_rgba(0,0,0,0.5)]'}`;
+  const baseClass = "relative rounded-b-xl transition-all duration-75 select-none shrink-0 touch-none group overflow-hidden border-x border-slate-300";
+  const whiteClass = `w-10 sm:w-12 h-44 sm:h-56 bg-slate-100 z-0 ${isActive ? 'bg-indigo-300 shadow-[inset_0_4px_12px_rgba(0,0,0,0.2)] translate-y-1' : 'shadow-[0_8px_0_#cbd5e1,0_15px_20px_rgba(0,0,0,0.3)]'}`;
+  const blackClass = `w-6 sm:w-8 h-28 sm:h-36 bg-slate-900 z-10 -mx-3 sm:-mx-4 rounded-b-md ${isActive ? 'bg-indigo-900 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] translate-y-1' : 'shadow-[0_6px_0_#000,0_10px_15px_rgba(0,0,0,0.5)]'}`;
   
   const highlightClass = isHighlighted ? 'after:content-[""] after:absolute after:bottom-4 after:left-1/2 after:-translate-x-1/2 after:w-2 after:h-2 after:rounded-full after:bg-indigo-400 after:shadow-[0_0_12px_rgba(129,140,248,0.8)]' : '';
 
