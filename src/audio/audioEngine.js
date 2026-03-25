@@ -1,47 +1,29 @@
 import * as Tone from 'tone';
 import { createPiano, createSynth, createCinematicPad, createStrings } from './instruments';
 
-// Maintenance: Force rebuild to resolve PWA caching/synchronization issues.
-
 class AudioEngine {
   constructor() {
+    // All Tone.js nodes are created lazily in init() to avoid
+    // triggering AudioContext before a user gesture.
     this.instruments = {};
     this.currentInstrument = null;
-    this.masterVolume = new Tone.Volume(0).toDestination();
-    
-    // Global Cinematic FX chain
-    this.reverb = new Tone.Reverb({
-      decay: 4,
-      preDelay: 0.1,
-      wet: 0.3
-    }).connect(this.masterVolume);
-    
-    this.delay = new Tone.FeedbackDelay({
-      delayTime: "8n",
-      feedback: 0.4,
-      wet: 0.2
-    }).connect(this.reverb);
+    this.masterVolume = null;
+    this.reverb = null;
+    this.delay = null;
+    this.filter = null;
+    this.lfo = null;
+    this.analyzer = null;
 
-    this.filter = new Tone.Filter(2000, "lowpass").connect(this.delay);
-    
     this.initialized = false;
     this.activeNotes = new Set();
     this.sustainedNotes = new Set();
-    
-    // Modulation LFO
-    this.lfo = new Tone.LFO("4n", 400, 4000).start();
-    this.lfo.connect(this.filter.frequency);
-    this.lfoStarted = false; // Manual state tracking
+    this.lfoStarted = false;
 
     // Arpeggiator
     this.arpActive = false;
     this.arpNotes = [];
     this.arpPattern = null;
     this.arpRate = "8n";
-
-    // For visualization
-    this.analyzer = new Tone.Analyser("waveform", 256);
-    this.masterVolume.connect(this.analyzer);
 
     // MIDI Support
     this.midiAccess = null;
@@ -50,11 +32,39 @@ class AudioEngine {
 
   async init(onReady) {
     if (this.initialized) return;
+
+    // Resume AudioContext from user gesture
     await Tone.start();
     Tone.context.lookAhead = 0.05;
-    
+
+    // NOW create all audio nodes (AudioContext is running)
+    this.masterVolume = new Tone.Volume(0).toDestination();
+
+    this.reverb = new Tone.Reverb({
+      decay: 4,
+      preDelay: 0.1,
+      wet: 0.3
+    }).connect(this.masterVolume);
+
+    this.delay = new Tone.FeedbackDelay({
+      delayTime: "8n",
+      feedback: 0.4,
+      wet: 0.2
+    }).connect(this.reverb);
+
+    this.filter = new Tone.Filter(2000, "lowpass").connect(this.delay);
+
+    // Modulation LFO — created but NOT started
+    this.lfo = new Tone.LFO("4n", 400, 4000);
+    this.lfo.connect(this.filter.frequency);
+
+    // Visualization
+    this.analyzer = new Tone.Analyser("waveform", 256);
+    this.masterVolume.connect(this.analyzer);
+
     await this.reverb.ready;
 
+    // Create instruments
     this.instruments['synth'] = createSynth().connect(this.filter);
     this.instruments['piano'] = createPiano(() => {
       console.log('Piano samples loaded');
@@ -64,7 +74,7 @@ class AudioEngine {
 
     this.currentInstrument = this.instruments['synth'];
     this.initialized = true;
-    
+
     // Auto-init MIDI if supported
     this.initMIDI();
 
@@ -92,11 +102,11 @@ class AudioEngine {
     const type = status & 0xf0;
     const note = Tone.Frequency(noteNum, "midi").toNote();
 
-    if (type === 144 && velocity > 0) { // Note On
+    if (type === 144 && velocity > 0) {
       this.playNote(note, velocity / 127);
       this.midiHandlers.forEach(h => h('on', note));
-    } else if (type === 128 || (type === 144 && velocity === 0)) { // Note Off
-      this.stopNote(note, false); // MIDI usually handles its own sustain/release
+    } else if (type === 128 || (type === 144 && velocity === 0)) {
+      this.stopNote(note, false);
       this.midiHandlers.forEach(h => h('off', note));
     }
   }
@@ -112,15 +122,15 @@ class AudioEngine {
   }
 
   setVolume(db) {
-    this.masterVolume.volume.rampTo(db, 0.1);
+    if (this.masterVolume) this.masterVolume.volume.rampTo(db, 0.1);
   }
 
   setCutoff(freq) {
-    this.filter.frequency.rampTo(freq, 0.1);
+    if (this.filter) this.filter.frequency.rampTo(freq, 0.1);
   }
 
   setReverbWet(wet) {
-    this.reverb.wet.rampTo(wet, 0.1);
+    if (this.reverb) this.reverb.wet.rampTo(wet, 0.1);
   }
 
   setEnvelope(attack, decay, sustain, release) {
@@ -141,9 +151,10 @@ class AudioEngine {
   }
 
   setLFO(active, rate = "4n", depth = 1000) {
+    if (!this.lfo) return;
     if (active) {
       this.lfo.frequency.value = rate;
-      this.lfo.amplitude.value = depth / 2000; // Normalize
+      this.lfo.amplitude.value = depth / 2000;
       if (!this.lfoStarted) {
         this.lfo.start();
         this.lfoStarted = true;
@@ -151,7 +162,7 @@ class AudioEngine {
     } else {
       this.lfo.stop();
       this.lfoStarted = false;
-      this.filter.frequency.value = 2000; // Reset
+      if (this.filter) this.filter.frequency.value = 2000;
     }
   }
 
@@ -174,18 +185,18 @@ class AudioEngine {
 
   playNote(note, velocity = 0.8) {
     if (!this.initialized || !this.currentInstrument) return;
-    
+
     if (this.arpActive) {
       if (!this.arpNotes.includes(note)) {
         this.arpNotes.push(note);
-        this.arpNotes.sort(); // Sort for predictable patterns
+        this.arpNotes.sort();
         this.updateArp();
       }
     } else {
       const finalVelocity = this.currentInstrument instanceof Tone.Sampler ? velocity : velocity * 0.5;
       this.currentInstrument.triggerAttack(note, Tone.now(), finalVelocity);
     }
-    
+
     this.activeNotes.add(note);
     this.sustainedNotes.add(note);
   }
@@ -193,7 +204,7 @@ class AudioEngine {
   stopNote(note, sustainEnabled) {
     if (!this.initialized || !this.currentInstrument) return;
     this.activeNotes.delete(note);
-    
+
     if (this.arpActive) {
       this.arpNotes = this.arpNotes.filter(n => n !== note);
       this.updateArp();
@@ -209,7 +220,7 @@ class AudioEngine {
 
   releaseSustain() {
     if (!this.initialized || !this.currentInstrument) return;
-    
+
     const toRelease = [];
     this.sustainedNotes.forEach(note => {
       if (!this.activeNotes.has(note)) {
@@ -217,7 +228,7 @@ class AudioEngine {
         this.sustainedNotes.delete(note);
       }
     });
-    
+
     if (toRelease.length > 0) {
       this.currentInstrument.triggerRelease(toRelease, Tone.now());
     }

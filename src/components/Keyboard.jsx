@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { Key } from './Key';
 import { getFullPianoKeys, KEYBOARD_MAP, getNoteFromStep, getScaleNotes } from '../utils/noteMap';
 import { useStore } from '../store/useStore';
