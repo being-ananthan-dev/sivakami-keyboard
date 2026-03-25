@@ -4,7 +4,6 @@ import { Controls } from './components/Controls';
 import { Visualizer } from './components/Visualizer';
 import { useAudio } from './hooks/useAudio';
 import { useStore } from './store/useStore';
-import { Waves } from 'lucide-react';
 
 function App() {
   const { isAudioReady, setSustain } = useStore();
@@ -17,6 +16,20 @@ function App() {
     window.addEventListener('keyup', up);
     return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
   }, [setSustain]);
+
+  useEffect(() => {
+    if (isAudioReady) return;
+    const startEngine = () => {
+      initAudio();
+    };
+    // Auto-init audio on first interaction so we don't need a landing page
+    window.addEventListener('pointerdown', startEngine, { once: true });
+    window.addEventListener('keydown', startEngine, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', startEngine);
+      window.removeEventListener('keydown', startEngine);
+    };
+  }, [isAudioReady, initAudio]);
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100 p-4 md:p-8 relative font-sans">
@@ -37,38 +50,21 @@ function App() {
             </div>
           </div>
 
-          {!isAudioReady ? (
-            <button onClick={initAudio}
-              className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-[0_0_30px_rgba(99,102,241,0.2)] hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] hover:-translate-y-0.5">
-              Initialize Engine
-            </button>
-          ) : (
-            <div className="flex items-center gap-3 px-4 py-2 bg-slate-900/50 rounded-full border border-white/5 backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-              <span className="text-[10px] uppercase font-black tracking-widest text-slate-300">Engine Active</span>
-            </div>
-          )}
+          <div className="flex items-center gap-3 px-4 py-2 bg-slate-900/50 rounded-full border border-white/5 backdrop-blur-md">
+            <span className={`w-2 h-2 rounded-full ${isAudioReady ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]'} animate-pulse`} />
+            <span className="text-[10px] uppercase font-black tracking-widest text-slate-300">
+              {isAudioReady ? 'Engine Active' : 'Engine Standby'}
+            </span>
+          </div>
         </header>
 
-        {!isAudioReady ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center py-20 animate-fade-in">
-            <div className="w-32 h-32 bg-slate-900/50 rounded-full flex items-center justify-center border border-white/10 mb-8 animate-pulse">
-              <Waves size={64} className="text-indigo-400 opacity-20" />
-            </div>
-            <h2 className="text-4xl font-black text-white mb-4 uppercase tracking-tighter">Enter the Soundstage</h2>
-            <p className="max-w-md text-slate-400 text-sm leading-relaxed font-medium">
-              A professional-grade scoring tool with full 88-key range and cinematic synthesis.
-            </p>
+        <div className="flex-1 flex flex-col gap-8 animate-fade-in">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div className="lg:col-span-2"><Controls /></div>
+            <Visualizer analyzer={analyzer} />
           </div>
-        ) : (
-          <div className="flex-1 flex flex-col gap-8 animate-fade-in">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-              <div className="lg:col-span-2"><Controls /></div>
-              <Visualizer analyzer={analyzer} />
-            </div>
-            <main className="w-full pb-12"><Keyboard /></main>
-          </div>
-        )}
+          <main className="w-full pb-12"><Keyboard /></main>
+        </div>
       </div>
     </div>
   );
