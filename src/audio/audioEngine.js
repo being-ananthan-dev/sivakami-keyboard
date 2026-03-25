@@ -21,6 +21,8 @@ class AudioEngine {
     this.recordedNotes = [];
     this.recordingStartTime = 0;
     this.activeTimeouts = [];
+    this.recorder = null;
+    this.lastAudioBlob = null;
   }
 
   async init() {
@@ -29,7 +31,9 @@ class AudioEngine {
 
     this.masterVol = new Tone.Volume(0).toDestination();
     this.analyzer = new Tone.Analyser('waveform', 256);
+    this.recorder = new Tone.Recorder();
     this.masterVol.connect(this.analyzer);
+    this.masterVol.connect(this.recorder);
 
     this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 }).connect(this.masterVol);
     await this.reverb.ready;
@@ -84,10 +88,29 @@ class AudioEngine {
     this.recordedNotes = [];
     this.recordingStartTime = performance.now();
     this.isRecordingEngine = true;
+    if (this.recorder) this.recorder.start();
   }
 
-  stopRecording() {
+  async stopRecording() {
     this.isRecordingEngine = false;
+    if (this.recorder && this.recorder.state === 'started') {
+      try { this.lastAudioBlob = await this.recorder.stop(); } catch (e) {}
+    }
+  }
+
+  downloadRecording() {
+    if (!this.lastAudioBlob) return;
+    const url = URL.createObjectURL(this.lastAudioBlob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = `VirtuKeys_Recording_${new Date().toISOString().replace(/[:.]/g, '-')}.webm`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 100);
   }
 
   playRecording() {

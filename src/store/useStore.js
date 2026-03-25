@@ -10,6 +10,7 @@ export const useStore = create((set) => ({
   octave: 3,
   isRecording: false,
   isPlaying: false,
+  hasRecording: false,
 
   setAudioReady: (v) => set({ isAudioReady: v }),
   setVolume: (v) => set({ volume: v }),
@@ -20,4 +21,5 @@ export const useStore = create((set) => ({
   setOctave: (v) => set({ octave: Math.max(1, Math.min(6, v)) }),
   setIsRecording: (v) => set({ isRecording: v }),
   setIsPlaying: (v) => set({ isPlaying: v }),
+  setHasRecording: (v) => set({ hasRecording: v }),
 }));

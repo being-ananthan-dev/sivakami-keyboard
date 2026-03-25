@@ -1,4 +1,4 @@
-import { Volume2, VolumeX, Waves, Circle, Square, Play } from 'lucide-react';
+import { Volume2, VolumeX, Waves, Circle, Square, Play, Download } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { engine } from '../audio/audioEngine';
 
@@ -10,22 +10,25 @@ export const Controls = () => {
     cutoff, setCutoff,
     reverbWet, setReverbWet,
     isRecording, setIsRecording,
-    isPlaying, setIsPlaying
+    isPlaying, setIsPlaying,
+    hasRecording, setHasRecording
   } = useStore();
 
-  const handleRecord = () => {
+  const handleRecord = async () => {
     if (isRecording) {
-      engine.stopRecording();
+      await engine.stopRecording();
       setIsRecording(false);
+      setHasRecording(true);
     } else {
       if (isPlaying) { engine.stopPlayingRecording(); setIsPlaying(false); }
       engine.startRecording();
       setIsRecording(true);
+      setHasRecording(false);
     }
   };
 
-  const handlePlay = () => {
-    if (isRecording) { engine.stopRecording(); setIsRecording(false); }
+  const handlePlay = async () => {
+    if (isRecording) { await engine.stopRecording(); setIsRecording(false); setHasRecording(true); }
     if (isPlaying) {
       engine.stopPlayingRecording();
       setIsPlaying(false);
@@ -85,6 +88,12 @@ export const Controls = () => {
             <button onClick={handlePlay} className={`flex items-center justify-center w-12 h-10 rounded-xl border transition-all ${isPlaying ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-slate-800/50 border-white/5 text-slate-400 hover:text-emerald-400'}`}>
               {isPlaying ? <Square size={16} className="fill-current" /> : <Play size={16} className="fill-current translate-x-0.5" />}
             </button>
+            {hasRecording && (
+              <button onClick={() => engine.downloadRecording()} className="flex items-center gap-2 px-4 h-10 rounded-xl border transition-all bg-indigo-500/20 border-indigo-500/50 text-indigo-400 hover:bg-indigo-500/40 hover:text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                <Download size={14} className="fill-current" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Save</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
