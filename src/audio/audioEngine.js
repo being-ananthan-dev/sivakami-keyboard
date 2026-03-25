@@ -40,6 +40,10 @@ class AudioEngine {
     // For visualization
     this.analyzer = new Tone.Analyser("waveform", 256);
     this.masterVolume.connect(this.analyzer);
+
+    // MIDI Support
+    this.midiAccess = null;
+    this.midiHandlers = [];
   }
 
   async init(onReady) {
@@ -58,7 +62,45 @@ class AudioEngine {
 
     this.currentInstrument = this.instruments['synth'];
     this.initialized = true;
+    
+    // Auto-init MIDI if supported
+    this.initMIDI();
+
     if (onReady) onReady();
+  }
+
+  async initMIDI() {
+    if (navigator.requestMIDIAccess) {
+      try {
+        this.midiAccess = await navigator.requestMIDIAccess();
+        for (let input of this.midiAccess.inputs.values()) {
+          input.onmidimessage = (msg) => this.handleMIDIMessage(msg);
+        }
+        return true;
+      } catch (e) {
+        console.warn("MIDI Access Denied", e);
+        return false;
+      }
+    }
+    return false;
+  }
+
+  handleMIDIMessage(msg) {
+    const [status, noteNum, velocity] = msg.data;
+    const type = status & 0xf0;
+    const note = Tone.Frequency(noteNum, "midi").toNote();
+
+    if (type === 144 && velocity > 0) { // Note On
+      this.playNote(note, velocity / 127);
+      this.midiHandlers.forEach(h => h('on', note));
+    } else if (type === 128 || (type === 144 && velocity === 0)) { // Note Off
+      this.stopNote(note, false); // MIDI usually handles its own sustain/release
+      this.midiHandlers.forEach(h => h('off', note));
+    }
+  }
+
+  onMIDIEvent(callback) {
+    this.midiHandlers.push(callback);
   }
 
   setInstrument(name) {
@@ -77,6 +119,17 @@ class AudioEngine {
 
   setReverbWet(wet) {
     this.reverb.wet.rampTo(wet, 0.1);
+  }
+
+  setEnvelope(attack, decay, sustain, release) {
+    Object.values(this.instruments).forEach(inst => {
+      if (inst.envelope) {
+        inst.envelope.attack = attack;
+        inst.envelope.decay = decay;
+        inst.envelope.sustain = sustain;
+        inst.envelope.release = release;
+      }
+    });
   }
 
   setArp(active, rate = "8n") {

@@ -13,7 +13,9 @@ export const Controls = ({ recorder }) => {
     arpRate, setArpRate,
     lfoActive, setLFOActive,
     lfoRate, setLFORate,
-    lfoDepth, setLFODepth
+    lfoDepth, setLFODepth,
+    attack, decay, sustainLevel, release, setEnvelope,
+    midiConnected
   } = useStore();
 
   const {
@@ -27,6 +29,14 @@ export const Controls = ({ recorder }) => {
     <div className="flex flex-col gap-6 p-6 bg-slate-950/80 backdrop-blur-2xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-6xl mx-auto mt-4 border border-white/5 relative overflow-hidden">
       <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
         <Waves size={160} className="text-indigo-400" />
+      </div>
+
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-[10px] text-indigo-300/40 uppercase font-black tracking-[0.4em]">Workstation Console</h2>
+        <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${midiConnected ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-slate-800/50 border-white/5 text-slate-500'}`}>
+          <div className={`w-1.5 h-1.5 rounded-full ${midiConnected ? 'bg-emerald-500 animate-pulse' : 'bg-slate-600'}`}></div>
+          <span className="text-[9px] font-black uppercase tracking-widest">{midiConnected ? 'MIDI Connected' : 'MIDI Discovery'}</span>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-start justify-between gap-8 relative z-10">
@@ -112,6 +122,28 @@ export const Controls = ({ recorder }) => {
               />
               <span className="text-[9px] text-purple-400/60 uppercase font-bold">Ambient</span>
             </div>
+          </div>
+        </div>
+
+        {/* Granular Envelope */}
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] text-indigo-300/60 uppercase font-black tracking-[0.2em]">Master Envelope</label>
+          <div className="flex gap-4 bg-slate-900/50 p-3 rounded-2xl border border-white/5 shadow-inner">
+            {[
+              { label: 'A', value: attack, key: 'attack', min: 0.001, max: 2, step: 0.01 },
+              { label: 'D', value: decay, key: 'decay', min: 0.1, max: 2, step: 0.01 },
+              { label: 'S', value: sustainLevel, key: 'sustainLevel', min: 0, max: 1, step: 0.01 },
+              { label: 'R', value: release, key: 'release', min: 0.1, max: 4, step: 0.01 },
+            ].map(ctrl => (
+              <div key={ctrl.key} className="flex flex-col gap-1 items-center">
+                <input 
+                  type="range" min={ctrl.min} max={ctrl.max} step={ctrl.step} value={ctrl.value} 
+                  onChange={(e) => setEnvelope({ [ctrl.key]: parseFloat(e.target.value) })}
+                  className="w-12 h-1 bg-slate-800 rounded-full appearance-none cursor-pointer accent-indigo-400"
+                />
+                <span className="text-[8px] text-slate-500 font-bold">{ctrl.label}</span>
+              </div>
+            ))}
           </div>
         </div>
 

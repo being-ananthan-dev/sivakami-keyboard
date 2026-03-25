@@ -5,7 +5,8 @@ import { useStore } from '../store/useStore';
 export const useAudio = () => {
   const { 
     volume, instrument, sustain, setAudioReady, cutoff, reverbWet,
-    arpActive, arpRate, lfoActive, lfoRate, lfoDepth
+    arpActive, arpRate, lfoActive, lfoRate, lfoDepth,
+    attack, decay, sustainLevel, release, setMIDIConnected
   } = useStore();
 
   useEffect(() => {
@@ -31,6 +32,18 @@ export const useAudio = () => {
   useEffect(() => {
     engine.setLFO(lfoActive, lfoRate, lfoDepth);
   }, [lfoActive, lfoRate, lfoDepth]);
+
+  useEffect(() => {
+    engine.setEnvelope(attack, decay, sustainLevel, release);
+  }, [attack, decay, sustainLevel, release]);
+
+  useEffect(() => {
+    if (isAudioReady) {
+      engine.initMIDI().then(connected => {
+        setMIDIConnected(connected);
+      });
+    }
+  }, [isAudioReady, setMIDIConnected]);
 
   useEffect(() => {
     if (!sustain) {

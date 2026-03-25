@@ -20,6 +20,15 @@ export const useStore = create((set) => ({
   lfoRate: "4n",
   lfoDepth: 1000,
 
+  // Granular Synthesis (ADSR)
+  attack: 0.1,
+  decay: 0.2,
+  sustainLevel: 0.8,
+  release: 1.5,
+  
+  // Hardware
+  midiConnected: false,
+
   setVolume: (vol) => set({ volume: vol }),
   setOctave: (oct) => set({ octave: Math.max(1, Math.min(6, oct)) }),
   setInstrument: (inst) => set({ instrument: inst }),
@@ -35,4 +44,7 @@ export const useStore = create((set) => ({
   setLFOActive: (active) => set({ lfoActive: active }),
   setLFORate: (rate) => set({ lfoRate: rate }),
   setLFODepth: (depth) => set({ lfoDepth: depth }),
+
+  setEnvelope: (env) => set((state) => ({ ...state, ...env })),
+  setMIDIConnected: (connected) => set({ midiConnected: connected }),
 }));
