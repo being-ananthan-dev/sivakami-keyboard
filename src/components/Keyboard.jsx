@@ -8,8 +8,8 @@ export const Keyboard = () => {
   const { octave } = useStore();
   const { playNote, stopNote } = useAudio();
   const [pressed, setPressed] = useState(new Set());
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
   const containerRef = useRef(null);
+  const thumbRef = useRef(null);
   const keys = useMemo(() => getFullPianoKeys(), []);
 
   const onMiniMap = (e) => {
@@ -30,7 +30,23 @@ export const Keyboard = () => {
     };
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
-    return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
+    
+    const handleScroll = () => {
+      if (!containerRef.current || !thumbRef.current) return;
+      const left = (containerRef.current.scrollLeft / containerRef.current.scrollWidth) * 100;
+      const width = (containerRef.current.clientWidth / containerRef.current.scrollWidth) * 100;
+      thumbRef.current.style.left = `${left}%`;
+      thumbRef.current.style.width = `${width}%`;
+    };
+    
+    const container = containerRef.current;
+    if (container) container.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => { 
+      window.removeEventListener('keydown', down); 
+      window.removeEventListener('keyup', up); 
+      if (container) container.removeEventListener('scroll', handleScroll);
+    };
   }, [octave]);
 
   return (
@@ -40,11 +56,8 @@ export const Keyboard = () => {
           <div className="absolute inset-0 flex">
             {keys.map((k, i) => <div key={i} className={`flex-1 h-full ${k.isBlack ? 'bg-slate-800' : 'bg-slate-700/50'} border-r border-white/5`} />)}
           </div>
-          <div className="absolute top-0 h-full bg-indigo-500/30 border-x border-indigo-400/50 pointer-events-none"
-            style={{
-              left: containerRef.current ? `${(containerRef.current.scrollLeft / containerRef.current.scrollWidth) * 100}%` : '40%',
-              width: containerRef.current ? `${(containerRef.current.clientWidth / containerRef.current.scrollWidth) * 100}%` : '20%'
-            }} />
+          <div ref={thumbRef} className="absolute top-0 h-full bg-indigo-500/30 border-x border-indigo-400/50 pointer-events-none"
+            style={{ left: '40%', width: '20%' }} />
         </div>
       </div>
       <div className="flex justify-between items-center px-6 text-[10px] uppercase tracking-[0.3em] text-slate-500 font-bold">
@@ -52,7 +65,7 @@ export const Keyboard = () => {
         <div className="h-px flex-1 mx-8 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
         <span>High Melodic</span>
       </div>
-      <div ref={containerRef} className="flex w-full overflow-x-auto py-8 select-none touch-none px-4 scrollbar-hide" onScroll={forceUpdate}>
+      <div ref={containerRef} className="flex w-full overflow-x-auto py-8 select-none touch-none px-4 scrollbar-hide">
         <div className="flex relative items-start">
           {keys.map(({ note, isBlack }) => (
             <Key key={note} note={note} isBlack={isBlack} isPhysicalPressed={pressed.has(note)} playNote={playNote} stopNote={stopNote} />
