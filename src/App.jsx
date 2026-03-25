@@ -90,8 +90,8 @@ function App() {
                   <h3 className="text-[10px] uppercase font-black tracking-widest text-indigo-400/60 mb-4">Mastering Engine</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between text-[11px] font-bold">
-                      <span className="text-slate-500">Range</span>
-                      <span className="text-slate-200 uppercase tracking-widest">88 Keys (A0-C8)</span>
+                      <span className="text-slate-500">Audio Range</span>
+                      <span className="text-slate-200 uppercase tracking-widest text-indigo-400">88 Keys (A0-C8)</span>
                     </div>
                     <div className="flex justify-between text-[11px] font-bold">
                       <span className="text-slate-500">Sample Rate</span>
