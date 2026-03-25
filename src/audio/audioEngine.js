@@ -1,6 +1,8 @@
 import * as Tone from 'tone';
 import { createPiano, createSynth, createCinematicPad, createStrings } from './instruments';
 
+// Maintenance: Force rebuild to resolve PWA caching/synchronization issues.
+
 class AudioEngine {
   constructor() {
     this.instruments = {};
