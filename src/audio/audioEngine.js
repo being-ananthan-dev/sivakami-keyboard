@@ -122,15 +122,24 @@ class AudioEngine {
   }
 
   setVolume(db) {
-    if (this.masterVolume) this.masterVolume.volume.rampTo(db, 0.1);
+    if (!this.masterVolume) return;
+    try {
+      this.masterVolume.volume.value = db;
+    } catch (e) { /* AudioContext not ready */ }
   }
 
   setCutoff(freq) {
-    if (this.filter) this.filter.frequency.rampTo(freq, 0.1);
+    if (!this.filter) return;
+    try {
+      this.filter.frequency.value = freq;
+    } catch (e) { /* AudioContext not ready */ }
   }
 
   setReverbWet(wet) {
-    if (this.reverb) this.reverb.wet.rampTo(wet, 0.1);
+    if (!this.reverb) return;
+    try {
+      this.reverb.wet.value = wet;
+    } catch (e) { /* AudioContext not ready */ }
   }
 
   setEnvelope(attack, decay, sustain, release) {

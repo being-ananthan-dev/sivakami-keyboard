@@ -1,12 +1,13 @@
-import { useEffect, useState, useMemo, useRef, useReducer } from 'react';
+import { useEffect, useMemo, useRef, useReducer, useState } from 'react';
 import { Key } from './Key';
 import { getFullPianoKeys, KEYBOARD_MAP, getNoteFromStep } from '../utils/noteMap';
 import { useStore } from '../store/useStore';
+import { useAudio } from '../hooks/useAudio';
 
 export const Keyboard = ({ recordEvent }) => {
   const { octave } = useStore();
+  const { playNote, stopNote } = useAudio();
   const [pressedKeys, setPressedKeys] = useState(new Set());
-  // Simple forceUpdate for minimap re-render on scroll
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   const keys = useMemo(() => {
@@ -115,6 +116,8 @@ export const Keyboard = ({ recordEvent }) => {
               isHighlighted={false}
               recordEvent={recordEvent}
               isPhysicalPressed={isPressed}
+              playNote={playNote}
+              stopNote={stopNote}
             />
           );
         })}

@@ -1,9 +1,7 @@
 import { useState, useRef } from 'react';
 import { useStore } from '../store/useStore';
-import { useAudio } from '../hooks/useAudio';
 
-export const Key = ({ note, isBlack, isHighlighted, recordEvent, isPhysicalPressed }) => {
-  const { playNote, stopNote } = useAudio();
+export const Key = ({ note, isBlack, isHighlighted, recordEvent, isPhysicalPressed, playNote, stopNote }) => {
   const [activePointers, setActivePointers] = useState(new Set());
   const { isAudioReady } = useStore();
   const keyRef = useRef(null);
@@ -14,7 +12,6 @@ export const Key = ({ note, isBlack, isHighlighted, recordEvent, isPhysicalPress
     if (!keyRef.current) return 0.8;
     const rect = keyRef.current.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    // Map Y position to velocity: bottom is louder (1.0), top is softer (0.4)
     const velocity = Math.max(0.4, Math.min(1.0, 0.4 + (y / rect.height) * 0.6));
     return velocity;
   };
