@@ -29,7 +29,7 @@ export const Visualizer = ({ analyzer }) => {
   }, [analyzer]);
 
   return (
-    <div className="w-full h-24 bg-slate-950/40 rounded-3xl border border-white/5 shadow-inner overflow-hidden relative">
+    <div className="w-full h-20 bg-slate-950/40 rounded-3xl border border-white/5 shadow-inner overflow-hidden relative">
       <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
         <span className="text-[10px] uppercase font-black tracking-[0.5em] text-indigo-300">Signal Flow</span>
       </div>

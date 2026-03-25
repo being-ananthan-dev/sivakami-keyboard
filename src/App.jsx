@@ -36,12 +36,12 @@ function App() {
   }, [isAudioReady, initAudio]);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 p-4 md:p-8 relative font-sans">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#020617] text-slate-100 p-4 md:p-6 flex flex-col relative font-sans">
       <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto flex flex-col relative z-10">
-        <header className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col relative z-10 overflow-hidden">
+        <header className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 flex-shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.3)] border border-white/10">
               <span className="text-2xl font-black text-white italic">S</span>
@@ -62,14 +62,16 @@ function App() {
           </div>
         </header>
 
-        <div className="flex-1 flex flex-col gap-8 animate-fade-in">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div className="flex-1 flex flex-col gap-6 animate-fade-in overflow-hidden">
+          <div className="flex-shrink-0 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <div className="lg:col-span-2"><Controls /></div>
             <Visualizer analyzer={analyzer} />
           </div>
-          <main className="w-full pb-8"><Keyboard /></main>
+          <main className="flex-1 flex flex-col justify-end min-h-0 pb-4 overflow-hidden">
+            <Keyboard />
+          </main>
           
-          <footer className="w-full flex justify-between items-center py-6 border-t border-white/5 opacity-40 hover:opacity-100 transition-opacity">
+          <footer className="w-full flex justify-between items-center py-2 border-t border-white/5 opacity-40 flex-shrink-0">
             <p className="text-[9px] uppercase tracking-[0.3em] font-black">Design & Engineering by Antigravity</p>
             <p className="text-[9px] uppercase tracking-[0.3em] font-black italic">Exclusively for Sivakami A G</p>
           </footer>

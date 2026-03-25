@@ -42,12 +42,12 @@ export const Controls = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-slate-950/80 backdrop-blur-2xl rounded-3xl shadow-2xl w-full border border-white/5 relative overflow-hidden">
+    <div className="flex flex-col gap-4 p-4 md:p-5 bg-slate-950/80 backdrop-blur-2xl rounded-3xl shadow-2xl w-full border border-white/5 relative overflow-hidden flex-shrink-0">
       <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
         <Waves size={140} className="text-indigo-400" />
       </div>
 
-      <h2 className="text-[10px] text-indigo-300/40 uppercase font-black tracking-[0.4em]">Workstation Console</h2>
+      <h2 className="text-[9px] text-indigo-300/40 uppercase font-black tracking-[0.4em]">Workstation Console</h2>
 
       <div className="flex flex-wrap items-start gap-8 relative z-10">
         {/* Source */}
@@ -99,8 +99,8 @@ export const Controls = () => {
       </div>
 
       {/* Footer */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mt-2 pt-4 border-t border-white/5">
-        <label className="flex items-center gap-4 cursor-pointer">
+      <div className="flex flex-wrap items-center justify-between gap-3 mt-1 pt-3 border-t border-white/5">
+        <label className="flex items-center gap-3 cursor-pointer">
           <div className="relative">
             <input type="checkbox" className="sr-only" checked={sustain} onChange={e => setSustain(e.target.checked)} />
             <div className={`block w-12 h-6 rounded-full transition-all ${sustain ? 'bg-indigo-500' : 'bg-slate-800'}`} />
