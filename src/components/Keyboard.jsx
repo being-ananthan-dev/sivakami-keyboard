@@ -1,21 +1,18 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, useReducer } from 'react';
 import { Key } from './Key';
-import { getFullPianoKeys, KEYBOARD_MAP, getNoteFromStep, getScaleNotes } from '../utils/noteMap';
+import { getFullPianoKeys, KEYBOARD_MAP, getNoteFromStep } from '../utils/noteMap';
 import { useStore } from '../store/useStore';
 
 export const Keyboard = ({ recordEvent }) => {
-  const { octave, scale } = useStore();
+  const { octave } = useStore();
   const [pressedKeys, setPressedKeys] = useState(new Set());
-  
-  const highlightedNotes = useMemo(() => {
-    return getScaleNotes(scale);
-  }, [scale]);
+  // Simple forceUpdate for minimap re-render on scroll
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   const keys = useMemo(() => {
     return getFullPianoKeys();
   }, []);
 
-  const [scrollX, setScrollX] = useState(0);
   const containerRef = useRef(null);
 
   const handleMiniMapClick = (e) => {
@@ -104,11 +101,10 @@ export const Keyboard = ({ recordEvent }) => {
       <div 
         ref={containerRef}
         className="flex w-full overflow-x-auto py-8 select-none touch-none px-4 scrollbar-hide active:cursor-grabbing"
-        onScroll={() => setScrollX(containerRef.current.scrollLeft)}
+        onScroll={() => forceUpdate()}
       >
         <div className="flex relative items-start">
         {keys.map(({ note, isBlack }) => {
-          const isHighlighted = highlightedNotes.includes(note.replace(/\d/, ''));
           const isPressed = pressedKeys.has(note);
           
           return (
@@ -116,7 +112,7 @@ export const Keyboard = ({ recordEvent }) => {
               key={note}
               note={note}
               isBlack={isBlack}
-              isHighlighted={isHighlighted}
+              isHighlighted={false}
               recordEvent={recordEvent}
               isPhysicalPressed={isPressed}
             />

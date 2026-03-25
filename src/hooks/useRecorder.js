@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { engine } from '../audio/audioEngine';
+import * as Tone from 'tone';
 
 export const useRecorder = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -26,7 +27,7 @@ export const useRecorder = () => {
   const recordEvent = useCallback((type, note) => {
     if (!isRecording) return;
     eventsRef.current.push({
-      type, // 'on' or 'off'
+      type,
       note,
       time: performance.now() - startTimeRef.current
     });
@@ -44,11 +45,7 @@ export const useRecorder = () => {
         if (event.type === 'on') {
           engine.playNote(event.note);
         } else {
-          // Release regardless of sustain pedal during playback
-          engine.activeNotes.delete(event.note);
-          if (engine.currentInstrument) {
-             engine.currentInstrument.triggerRelease(event.note, engine.Tone ? engine.Tone.now() : undefined);
-          }
+          engine.stopNote(event.note, false);
         }
       }, event.time);
       timersRef.current.push(timer);

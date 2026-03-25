@@ -4,7 +4,6 @@ import { useStore } from '../store/useStore';
 export const Controls = ({ recorder }) => {
   const { 
     volume, setVolume, 
-    octave, setOctave, 
     instrument, setInstrument,
     sustain, setSustain,
     cutoff, setCutoff,
