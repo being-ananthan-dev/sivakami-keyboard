@@ -8,6 +8,8 @@ export const useStore = create((set) => ({
   cutoff: 5000,
   reverbWet: 0.3,
   octave: 3,
+  isRecording: false,
+  isPlaying: false,
 
   setAudioReady: (v) => set({ isAudioReady: v }),
   setVolume: (v) => set({ volume: v }),
@@ -16,4 +18,6 @@ export const useStore = create((set) => ({
   setCutoff: (v) => set({ cutoff: v }),
   setReverbWet: (v) => set({ reverbWet: v }),
   setOctave: (v) => set({ octave: Math.max(1, Math.min(6, v)) }),
+  setIsRecording: (v) => set({ isRecording: v }),
+  setIsPlaying: (v) => set({ isPlaying: v }),
 }));

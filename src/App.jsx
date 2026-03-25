@@ -25,9 +25,13 @@ function App() {
     // Auto-init audio on first interaction so we don't need a landing page
     window.addEventListener('pointerdown', startEngine, { once: true });
     window.addEventListener('keydown', startEngine, { once: true });
+    window.addEventListener('touchstart', startEngine, { once: true });
+    window.addEventListener('click', startEngine, { once: true });
     return () => {
       window.removeEventListener('pointerdown', startEngine);
       window.removeEventListener('keydown', startEngine);
+      window.removeEventListener('touchstart', startEngine);
+      window.removeEventListener('click', startEngine);
     };
   }, [isAudioReady, initAudio]);
 

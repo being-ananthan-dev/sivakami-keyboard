@@ -15,6 +15,12 @@ class AudioEngine {
     this.analyzer = null;
     this.activeNotes = new Set();
     this.sustainedNotes = new Set();
+    
+    // Recording state
+    this.isRecordingEngine = false;
+    this.recordedNotes = [];
+    this.recordingStartTime = 0;
+    this.activeTimeouts = [];
   }
 
   async init() {
@@ -74,19 +80,55 @@ class AudioEngine {
   setCutoff(f) { if (this.filter) this.filter.frequency.value = f; }
   setReverb(w) { if (this.reverb) this.reverb.wet.value = w; }
 
-  playNote(note, velocity = 0.8) {
+  startRecording() {
+    this.recordedNotes = [];
+    this.recordingStartTime = performance.now();
+    this.isRecordingEngine = true;
+  }
+
+  stopRecording() {
+    this.isRecordingEngine = false;
+  }
+
+  playRecording() {
+    if (this.recordedNotes.length === 0) return 0;
+    this.stopPlayingRecording(); // clear existing if running
+    let maxTime = 0;
+    this.recordedNotes.forEach(evt => {
+      if (evt.time > maxTime) maxTime = evt.time;
+      const id = setTimeout(() => {
+        if (evt.type === 'play') this.playNote(evt.note, 0.8, true);
+        if (evt.type === 'stop') this.stopNote(evt.note, false, true);
+      }, evt.time);
+      this.activeTimeouts.push(id);
+    });
+    return maxTime; // return duration
+  }
+
+  stopPlayingRecording() {
+    this.activeTimeouts.forEach(id => clearTimeout(id));
+    this.activeTimeouts = [];
+  }
+
+  playNote(note, velocity = 0.8, isPlayback = false) {
     if (!this.initialized || !this.currentInstrument) return;
     try {
       const v = this.currentInstrument === this.sampler ? velocity : velocity * 0.5;
       this.currentInstrument.triggerAttack(note, Tone.now(), v);
       this.activeNotes.add(note);
       this.sustainedNotes.add(note);
+      if (this.isRecordingEngine && !isPlayback) {
+        this.recordedNotes.push({ type: 'play', note, time: performance.now() - this.recordingStartTime });
+      }
     } catch (e) { console.warn('playNote error', e.message); }
   }
 
-  stopNote(note, sustainOn) {
+  stopNote(note, sustainOn, isPlayback = false) {
     if (!this.initialized || !this.currentInstrument) return;
     this.activeNotes.delete(note);
+    if (this.isRecordingEngine && !isPlayback) {
+      this.recordedNotes.push({ type: 'stop', note, time: performance.now() - this.recordingStartTime });
+    }
     if (!sustainOn) {
       try { this.currentInstrument.triggerRelease(note, Tone.now()); } catch (e) {}
       this.sustainedNotes.delete(note);

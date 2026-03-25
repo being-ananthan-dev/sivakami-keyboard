@@ -1,5 +1,6 @@
-import { Volume2, VolumeX, Waves } from 'lucide-react';
+import { Volume2, VolumeX, Waves, Circle, Square, Play } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { engine } from '../audio/audioEngine';
 
 export const Controls = () => {
   const {
@@ -8,7 +9,34 @@ export const Controls = () => {
     sustain, setSustain,
     cutoff, setCutoff,
     reverbWet, setReverbWet,
+    isRecording, setIsRecording,
+    isPlaying, setIsPlaying
   } = useStore();
+
+  const handleRecord = () => {
+    if (isRecording) {
+      engine.stopRecording();
+      setIsRecording(false);
+    } else {
+      if (isPlaying) { engine.stopPlayingRecording(); setIsPlaying(false); }
+      engine.startRecording();
+      setIsRecording(true);
+    }
+  };
+
+  const handlePlay = () => {
+    if (isRecording) { engine.stopRecording(); setIsRecording(false); }
+    if (isPlaying) {
+      engine.stopPlayingRecording();
+      setIsPlaying(false);
+    } else {
+      const duration = engine.playRecording();
+      if (duration > 0) {
+        setIsPlaying(true);
+        setTimeout(() => setIsPlaying(false), duration + 3000);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6 p-6 bg-slate-950/80 backdrop-blur-2xl rounded-3xl shadow-2xl w-full border border-white/5 relative overflow-hidden">
@@ -45,6 +73,18 @@ export const Controls = () => {
                 className="w-24 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-400" />
               <span className="text-[9px] text-purple-400/60 uppercase font-bold">Ambient</span>
             </div>
+          </div>
+        </div>
+        {/* Sequencer */}
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] text-indigo-300/60 uppercase font-black tracking-widest">Sequencer</label>
+          <div className="flex gap-2 bg-slate-900/50 p-3 rounded-2xl border border-white/5">
+            <button onClick={handleRecord} className={`flex items-center justify-center w-12 h-10 rounded-xl border transition-all ${isRecording ? 'bg-red-500/20 border-red-500/50 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-slate-800/50 border-white/5 text-slate-400 hover:text-red-400'}`}>
+              {isRecording ? <Square size={16} className="fill-current" /> : <Circle size={16} className="fill-current" />}
+            </button>
+            <button onClick={handlePlay} className={`flex items-center justify-center w-12 h-10 rounded-xl border transition-all ${isPlaying ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-slate-800/50 border-white/5 text-slate-400 hover:text-emerald-400'}`}>
+              {isPlaying ? <Square size={16} className="fill-current" /> : <Play size={16} className="fill-current translate-x-0.5" />}
+            </button>
           </div>
         </div>
       </div>
